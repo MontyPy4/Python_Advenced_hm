@@ -1,3 +1,4 @@
+
 import re
 from pydantic import BaseModel, EmailStr, Field, ValidationError, field_validator, model_validator
 import json
@@ -8,8 +9,8 @@ import json
 # -----------------------
 
 class Address(BaseModel):
-    city: str = Field(min_length=2)
-    street: str = Field(min_length=3)
+    city: str = Field(..., min_length=2)
+    street: str = Field(..., min_length=3)
     house_number: int = Field(gt=0)
 
 
@@ -30,11 +31,15 @@ class User(BaseModel):
     def name_must_contain_only_letters(cls, value):
         if not re.fullmatch(r"[A-Za-z\s]+", value):
             raise ValueError("Name must contain only letters and spaces")
-        return value
+
+        # for word in splitted_name:
+        #     if not word.isalpha():
+        #         raise ValueError("Name must contain only letters and spaces")
+        return value   # функция должна возвращать значение - в противном случаи Ошибка
 
     # Кастомная валидация возраста и занятости
-    @model_validator(mode="after")
-    def check_employment_age(self):
+    @model_validator(mode="after")   # after (преобразованные) | before (сырые данные) - мы получим ДО преобразования, или ПОСЛЕ преобразования типа
+    def check_employment_age(self):   # self - объект класса User
         if self.is_employed:
             if not (18 <= self.age <= 65):
                 raise ValueError(
