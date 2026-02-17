@@ -28,7 +28,6 @@ engine = create_engine("sqlite:///:memory:", echo=True)
 
 # Задача 2: Создание сессии
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-session = SessionLocal()
 
 # Задача 4: Модель Category
 class Category(Base):
@@ -58,7 +57,7 @@ class Product(Base):
     __tablename__ = 'products'
 
     id: Mapped[int] = mapped_column(
-        BigInteger,
+        Integer,
         primary_key=True,
         autoincrement=True
     )
@@ -92,28 +91,36 @@ Base.metadata.create_all(bind=engine)
 
 # Пример использования
 if __name__ == "__main__":
-    # Создание категории
-    electronics = Category(
-        name="Electronics",
-        description="Electronic devices and gadgets"
-    )
+    # Создание сессии
+    session = SessionLocal()
     
-    # Создание продукта
-    laptop = Product(
-        name="Laptop",
-        price=Decimal("999.99"),
-        in_stock=True,
-        category=electronics
-    )
-    
-    # Добавление в сессию и коммит
-    session.add(electronics)
-    session.add(laptop)
-    session.commit()
-    
-    # Проверка
-    product = session.query(Product).first()
-    print(f"Product: {product.name}, Category: {product.category.name}")
-    
-    # Закрытие сессии
-    session.close()
+    try:
+        # Создание категории
+        electronics = Category(
+            name="Electronics",
+            description="Electronic devices and gadgets"
+        )
+        
+        # Создание продукта
+        laptop = Product(
+            name="Laptop",
+            price=Decimal("999.99"),
+            in_stock=True,
+            category=electronics
+        )
+        
+        # Добавление в сессию и коммит
+        session.add(electronics)
+        session.add(laptop)
+        session.commit()
+        
+        # Проверка
+        product = session.query(Product).first()
+        print(f"Product: {product.name}, Category: {product.category.name}")
+        
+    except Exception as e:
+        print(f"Ошибка: {e}")
+        session.rollback()
+    finally:
+        # Закрытие сессии
+        session.close()
