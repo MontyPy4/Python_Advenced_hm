@@ -1,0 +1,7 @@
+Команды для создания и запуска Docker контейнера:
+
+1. Создание Docker образа:
+   docker build -t memory-monitor .
+
+2. Запуск контейнера с монтированием директории для сохранения результатов (Windows):
+   docker run -v "${PWD}/data:/app/data" memory-monitor
